@@ -15,5 +15,4 @@
 | 2    | Facebook  | https://www.facebook.com    |
 | 3    | Youtube   | https://www.youtube.com     |
 | 4    | Netflix   | https://www.netflix.com/th/ |
-=======
->>>>>>> b0c6593dc0033f21092a718153472ab719469ec5
+
