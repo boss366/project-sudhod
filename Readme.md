@@ -10,8 +10,7 @@
 
 | ลำดับ | ช่องทาง | ลิ้ง |
 | :--: | :----: | :-: |
-
-| 1 | Instagram | https://www.instagram.com   |
-| 2 | Facebook  | https://www.facebook.com    |
-| 3 | Youtube   | https://www.youtube.com     |
-| 4 | Netflix   | https://www.netflix.com/th/ |
+| 1    | Instagram | https://www.instagram.com   |
+| 2    | Facebook  | https://www.facebook.com    |
+| 3    | Youtube   | https://www.youtube.com     |
+| 4    | Netflix   | https://www.netflix.com/th/ |
