@@ -7,6 +7,13 @@
 
 สามารถติดต่อพูดคุยกับเราได้ในทาง ig: [actlikeache](https://www.instagram.com/actlikeache/)
 
+## test code 
+
+'''Python
+def test():
+    return False
+'''
+
 # test ระบบ
 
 | ลำดับ | ช่องทาง | ลิ้ง |
