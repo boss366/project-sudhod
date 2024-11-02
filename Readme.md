@@ -9,10 +9,12 @@
 
 ## test code 
 
-'''Python
+this is `Python`
+
+```
 def test():
     return False
-'''
+```
 
 # test ระบบ
 
