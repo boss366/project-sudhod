@@ -5,7 +5,7 @@
 
 ## ช่องทางติดต่อ
 
-สามารถติดต่อพูดคุยกับเราได้ในทาง [ig](https://www.instagram.com/actlikeache/)
+สามารถติดต่อพูดคุยกับเราได้ในทาง ig: [actlikeache](https://www.instagram.com/actlikeache/)
 
 # test ระบบ
 
