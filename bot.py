@@ -1,18 +1,14 @@
 import discord
-from discord.ext import commands
 
+class MyClient(discord.Client):
+    async def on_ready(self):
+        print(f'Logged on as {self.user}!')
 
-bot = commands.Bot(command_prefix="!")
+    async def on_message(self, message):
+        print(f'Message from {message.author}: {message.content}')
 
+intents = discord.Intents.default()
+intents.message_content = True
 
-@bot.event
-async def on_ready():
-    print(f"Logged in as {bot.user}")
-
-
-@bot.command()
-async def hello(ctx):
-    await ctx.send("Hello, I am a robot")
-
-bot.run("Token")
-
+client = MyClient(intents=intents)
+client.run('my token goes here')
