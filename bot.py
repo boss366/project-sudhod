@@ -1,9 +1,16 @@
 import os
 from dotenv import load_dotenv
 import discord
+from discord.ext import commands
 
 load_dotenv('heheha.env')
 token = os.getenv('DISCORD_TOKEN')
+
+client = commands.Bot(command_prefix='!', intents=discord.Intents.all())
+
+@client.event
+async def on_ready():
+    print(f'Hi, I am a Bot for coding!!!')
 
 class MyClient(discord.Client):
     async def on_ready(self):
