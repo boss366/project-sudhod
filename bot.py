@@ -17,5 +17,3 @@ intents.message_content = True
 
 client = MyClient(intents=intents)
 client.run(token)
-
-print(f"Token loaded: {token}")  # Verify if the token is loaded correctly
