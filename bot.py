@@ -6,15 +6,9 @@ from discord.ext import commands
 load_dotenv('heheha.env')
 token = os.getenv('DISCORD_TOKEN')
 
-client = commands.Bot(command_prefix='!', intents=discord.Intents.all())
-
-@client.event
-async def on_ready():
-    print(f'Hi, I am a Bot for coding!!!')
-
 class MyClient(discord.Client):
     async def on_ready(self):
-        print(f'Logged on as {self.user}!')
+        print(f'Hi I am {self.user.name}, I can help learning about coding.')
 
     async def on_message(self, message):
         print(f'Message from {message.author}: {message.content}')
