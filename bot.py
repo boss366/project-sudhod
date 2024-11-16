@@ -1,14 +1,14 @@
 import os
-from dotenv import load_dotenv
 import discord
-from discord.ext import commands
-from discord import Interaction
-from discord import FFmpegPCMAudio
 import yt_dlp
 import asyncio
 
-queue = []
+from dotenv import load_dotenv
+from discord.ext import commands
+from discord import Interaction
+from discord import FFmpegPCMAudio
 
+queue = []
 
 load_dotenv('heheha.env')
 token = os.getenv('DISCORD_TOKEN')
@@ -62,6 +62,7 @@ async def play_song(ctx, url):
             audio_url = info['url']
             title = info['title']
 
+        #ตรงส่วนนี้ทำให้บอทสามารถเล่นเพลงอันต่อไปได้
         def play_next(_):
             if queue:
                 next_url = queue.pop(0)
@@ -78,16 +79,16 @@ async def play_song(ctx, url):
 
 @client.command()
 async def skip(ctx):
-    # Check if the bot is connected to a voice channel
     if ctx.voice_client is None:
         await ctx.send("I'm not connected to a voice channel.")
         return
 
-    # Check if something is currently playing
     if ctx.voice_client.is_playing():
-        ctx.voice_client.stop()  # Stops the current audio
+        ctx.voice_client.stop() 
         await ctx.send("Skipped the current track!")
     else:
         await ctx.send("There's nothing to skip!")
+
+
 
 client.run(token)
