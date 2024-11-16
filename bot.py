@@ -10,7 +10,7 @@ from discord import FFmpegPCMAudio
 
 queue = []
 
-load_dotenv('heheha.env')
+load_dotenv('Token.env')
 token = os.getenv('DISCORD_TOKEN')
 
 intents = discord.Intents.default()
@@ -88,7 +88,5 @@ async def skip(ctx):
         await ctx.send("Skipped the current track!")
     else:
         await ctx.send("There's nothing to skip!")
-
-
 
 client.run(token)
