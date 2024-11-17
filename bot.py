@@ -2,6 +2,8 @@ import os
 import discord
 import yt_dlp
 import asyncio
+import random
+import json
 
 from dotenv import load_dotenv
 from discord.ext import commands
@@ -26,13 +28,14 @@ async def on_ready():
 
 @client.tree.command(name="join", description="Make the bot join your voice channel.")
 async def join(interaction: discord.Interaction):
+    if interaction.user.voice is None:
+        await interaction.response.send_message("คุณยังไม่ได้เอาผมเข้าช่องดิสเลย!", ephemeral=True)
+        return
+    
     channel = interaction.user.voice.channel
-    if interaction.user.voice:
-        channel = interaction.user.voice.channel
-        await channel.connect()
-        await interaction.response.send_message(f"เข้ามาในช่อง {channel} แล้วจ้าา!")
-    else:
-        await interaction.response.send_message("คุณยังไม่ได้เอาผมเข้าช่องดิสเลย!")
+    
+    await channel.connect()
+    await interaction.response.send_message(f"เข้ามาในช่อง {channel} แล้วจ้าา!")
 
 @client.tree.command(name="leave",description="Make the bot leave your voice channel.")
 async def leave(interaction: discord.Interaction):
@@ -50,6 +53,12 @@ async def play(interaction: discord.Interaction, url: str):
         with yt_dlp.YoutubeDL({'format': 'bestaudio', 'noplaylist': True}) as ydl:
             info = ydl.extract_info(url, download=False)
             title = info['title']
+        
+        vc = interaction.guild.voice_client
+
+        if not vc:
+            channel = interaction.user.voice.channel
+            vc = await channel.connect()
 
         if interaction.guild.voice_client is None:
             if interaction.user.voice:
@@ -58,8 +67,6 @@ async def play(interaction: discord.Interaction, url: str):
             else:
                 await interaction.followup.send("Join a voice channel first!")
                 return
-        
-        vc = interaction.guild.voice_client
 
         if vc.is_playing():
             queue.append(url)
@@ -97,13 +104,26 @@ async def play_song(interaction: discord.Interaction, url: str):
 @client.tree.command(name="skip",description="Skip the current song.")
 async def skip(interaction: discord.Interaction):
     if interaction.guild.voice_client is None:
-        await interaction.response.send_message("ยังไม่ได้เช้าช่องดิสเลย.")
+        await interaction.response.send_message("ยังไม่ได้เช้าช่องดิสเลยนะ :P")
         return
 
     if interaction.guild.voice_client.is_playing():
         interaction.guild.voice_client.stop() 
-        await interaction.response.send_message("ข้ามเพลงแล้วจ้าา!")
     else:
-        await interaction.response.send_message("ไม่มีเพลงให้ข้ามนะ:D")
+        await interaction.response.send_message("ไม่มีเพลงให้ข้ามนะ :D")
+
+random_messages = [
+    "Hello, world!",
+    "How's it going?",
+    "What's up?",
+    "I'm a bot, beep boop!",
+    "Have a great day!",
+    "Here's a random message just for you!"
+]
+
+@client.tree.command(name="test", description="Send a random message!")
+async def random_message(interaction: discord.Interaction):
+    message = random.choice(random_messages)
+    await interaction.response.send_message(message)
 
 client.run(token)
