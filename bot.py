@@ -10,6 +10,7 @@ from discord.ext import commands
 from discord import Interaction
 from discord import FFmpegPCMAudio
 from discord import app_commands
+from discord.ui import Button, View
 
 queue = []
 
@@ -21,11 +22,15 @@ intents.message_content = True
 
 client = commands.Bot(command_prefix='!', intents=intents)
 
+with open('quest.json', 'r') as file:
+    data = json.load(file)
+
 @client.event
 async def on_ready():
     print(f'Logged in as {client.user}')
     await client.tree.sync()
 
+# commandเอาไว้เข้า
 @client.tree.command(name="join", description="Make the bot join your voice channel.")
 async def join(interaction: discord.Interaction):
     if interaction.user.voice is None:
@@ -37,6 +42,7 @@ async def join(interaction: discord.Interaction):
     await channel.connect()
     await interaction.response.send_message(f"เข้ามาในช่อง {channel} แล้วจ้าา!")
 
+# commandเอาไว้ออก
 @client.tree.command(name="leave",description="Make the bot leave your voice channel.")
 async def leave(interaction: discord.Interaction):
     voice_client = interaction.guild.voice_client
@@ -46,6 +52,7 @@ async def leave(interaction: discord.Interaction):
     else:
         await interaction.response.send_message("คุณยังไม่ได้เอาผมเข้าช่องดิสเลย!")
 
+# ตรงนี้เป็นcommandเล่นเพลง
 @client.tree.command(name="play",description="Make the bot play a song.")
 async def play(interaction: discord.Interaction, url: str):
     try:
@@ -77,6 +84,7 @@ async def play(interaction: discord.Interaction, url: str):
     except Exception as e:
         await interaction.followup.send(f"An error occurred: {e}")
 
+# ตรงนี้เป็นcommandทำให้เล่นเพลงได้แบบต่อเนื่อง
 async def play_song(interaction: discord.Interaction, url: str):
     vc = interaction.guild.voice_client
 
@@ -101,6 +109,7 @@ async def play_song(interaction: discord.Interaction, url: str):
     except Exception as e:
         await interaction.followup.send(f"An error occurred: {e}")
 
+# อันนี้เป็นcommandเอาไว้ข้ามเพลง
 @client.tree.command(name="skip",description="Skip the current song.")
 async def skip(interaction: discord.Interaction):
     if interaction.guild.voice_client is None:
@@ -112,18 +121,38 @@ async def skip(interaction: discord.Interaction):
     else:
         await interaction.response.send_message("ไม่มีเพลงให้ข้ามนะ :D")
 
-random_messages = [
-    "Hello, world!",
-    "How's it going?",
-    "What's up?",
-    "I'm a bot, beep boop!",
-    "Have a great day!",
-    "Here's a random message just for you!"
-]
 
+async def button2_callback(interaction: discord.Interaction):
+    await interaction.response.send_message(f"แล้ว {interaction.user.display_name} จะมากดปุ่มอันที่สองไมเนี่ย")
+
+@client.tree.command(name="coding",description="Show a coding question.")
+async def send_botton(interaction: discord.Interaction):
+    button1 = Button(label="Click Me!", style=discord.ButtonStyle.green)
+    button1.callback = button1_callback
+
+    
+    button2 = Button(label="Click ME!", style=discord.ButtonStyle.red)
+    button2.callback = button2_callback
+
+    # Create a view to hold the button
+    view = View()
+    view.add_item(button1)
+    view.add_item(button2)
+
+    # Send a message with the button
+    await interaction.response.send_message("You can click the button dai na ja :P", view=view)
+
+level_1_questions = data["level 1"]
+random_question = random.choice(level_1_questions)
+
+# ตรงนี้เเป็นcommandเอาไว้สุ่มข้อความ
 @client.tree.command(name="test", description="Send a random message!")
 async def random_message(interaction: discord.Interaction):
-    message = random.choice(random_messages)
-    await interaction.response.send_message(message)
+    question_text = random_question.get("question", "No question found!")
+    await interaction.response.send_message(f"**Question:** {question_text}")
+
+async def button1_callback(interaction: discord.Interaction):
+    question_text = random_question.get("question", "No question found!")
+    await interaction.response.send_message(f"**Question:** {question_text}")
 
 client.run(token)
