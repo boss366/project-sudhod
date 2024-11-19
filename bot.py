@@ -121,17 +121,13 @@ async def skip(interaction: discord.Interaction):
     else:
         await interaction.response.send_message("ไม่มีเพลงให้ข้ามนะ :D")
 
-
-async def button2_callback(interaction: discord.Interaction):
-    await interaction.response.send_message(f"แล้ว {interaction.user.display_name} จะมากดปุ่มอันที่สองไมเนี่ย")
-
 @client.tree.command(name="coding",description="Show a coding question.")
 async def send_botton(interaction: discord.Interaction):
-    button1 = Button(label="Click Me!", style=discord.ButtonStyle.green)
+    button1 = Button(label="Level 1", style=discord.ButtonStyle.green)
     button1.callback = button1_callback
 
     
-    button2 = Button(label="Click ME!", style=discord.ButtonStyle.red)
+    button2 = Button(label="Level 2", style=discord.ButtonStyle.grey)
     button2.callback = button2_callback
 
     # Create a view to hold the button
@@ -143,16 +139,25 @@ async def send_botton(interaction: discord.Interaction):
     await interaction.response.send_message("You can click the button dai na ja :P", view=view)
 
 level_1_questions = data["level 1"]
-random_question = random.choice(level_1_questions)
+level_2_questions = data["level 2"]
+random_question1 = random.choice(level_1_questions)
+random_question2 = random.choice(level_2_questions)
 
-# ตรงนี้เเป็นcommandเอาไว้สุ่มข้อความ
-@client.tree.command(name="test", description="Send a random message!")
-async def random_message(interaction: discord.Interaction):
-    question_text = random_question.get("question", "No question found!")
-    await interaction.response.send_message(f"**Question:** {question_text}")
-
+# ตรงนี้เป็นcommandเอาไว้สุ่มข้อความ
 async def button1_callback(interaction: discord.Interaction):
-    question_text = random_question.get("question", "No question found!")
-    await interaction.response.send_message(f"**Question:** {question_text}")
+    random_question1 = random.choice(level_1_questions)
+    question_text1 = random_question1.get("question", "No question found!")
+    input_text1 = random_question1.get("input", "No input found!")
+    output_text1 = random_question1.get("output", "No output found!")
+
+    await interaction.response.send_message(f"**Question:** \n{question_text1} \n**input:** \n{input_text1} \n**output:** \n{output_text1}")
+
+async def button2_callback(interaction: discord.Interaction):
+    random_question2 = random.choice(level_2_questions)
+    question_text2 = random_question2.get("question", "No question found!")
+    input_text2 = random_question2.get("input", "No input found!")
+    output_text2 = random_question2.get("output", "No output found!")
+
+    await interaction.response.send_message(f"**Question:** \n{question_text2} \n**input:** \n{input_text2} \n**output:** \n{output_text2}")
 
 client.run(token)
