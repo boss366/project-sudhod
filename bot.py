@@ -21,6 +21,7 @@ token = os.getenv('DISCORD_TOKEN')
 intents = discord.Intents.default()
 intents.message_content = True
 intents.reactions = True
+intents.members = True
 
 client = commands.Bot(command_prefix='!', intents=intents)
 
@@ -59,58 +60,73 @@ async def on_guild_join(guild):
             await channel.send(embed=embed)
             break
 
-'''
-รอแก้งาน
-'''
-# @client.command(name="role")
-# async def reaction_role(ctx):
-#     global role_message_id
-#     message = await ctx.send(
-#         "React to this message to get a role!\n"
-#         "✅ for Verified"
-#     )
+@client.event
+async def on_member_join(member):
+    print(f"New member joined: {member.display_name}")
+    # Send a welcome message in the default text channel or a specific channel
+    channel = discord.utils.get(member.guild.text_channels, name='welcome')
 
-#     # Add reaction to the message
-#     await message.add_reaction("✅")
-#     role_message_id = message.id
-#     print(f"Role message ID is set to {role_message_id}")
+    if channel:
+        view = View()
 
-# @client.event
-# async def on_raw_reaction_add(payload):
-#     global role_message_id
+        embed = discord.Embed(
+            title=f"ยินดีตอนรับ {member.display_name} เข้ามาใน {member.guild.name} น้าาาา 👋🤓",
+            description="ขอให้สนุกกับการมาในดิสนี้นะจ้ะะ",
+            color=discord.Color.blue(),
+        )
+        await channel.send(embed=embed, view=view)
+    else:
+        print("Default text channel not found.")
+
+@client.command(name="role")
+async def reaction_role(ctx):
+    global role_message_id
+    message = await ctx.send(
+        "React to this message to get a role!\n"
+        "✅ for Verified"
+    )
+
+    # Add reaction to the message
+    await message.add_reaction("✅")
+    role_message_id = message.id
+    print(f"Role message ID is set to {role_message_id}")
+
+@client.event
+async def on_raw_reaction_add(payload):
+    global role_message_id
     
-#     # Ensure the reaction is from the correct message
-#     if payload.message_id != role_message_id:
-#         return
+    # Ensure the reaction is from the correct message
+    if payload.message_id != role_message_id:
+        return
     
-#     guild = client.get_guild(payload.guild_id)
-#     if guild is None:
-#         return  # Bot is not in the guild
+    guild = client.get_guild(payload.guild_id)
+    if guild is None:
+        return  # Bot is not in the guild
     
-#     member = guild.get_member(payload.user_id)
-#     if member is None or member.bot:
-#         return  # Ignore bots or invalid members
+    member = guild.get_member(payload.user_id)
+    if member is None or member.bot:
+        return  # Ignore bots or invalid members
     
-#     emoji = str(payload.emoji)
-#     role_name = emoji_to_role.get(emoji)
-#     if role_name is None:
-#         return  # No role associated with this emoji
+    emoji = str(payload.emoji)
+    role_name = emoji_to_role.get(emoji)
+    if role_name is None:
+        return  # No role associated with this emoji
     
-#     # Get or create the role
-#     role = discord.utils.get(guild.roles, name=role_name)
-#     if role is None:
-#         # If role doesn't exist, create it
-#         role = await guild.create_role(name=role_name)
-#         print(f"Created role {role.name}")
+    # Get or create the role
+    role = discord.utils.get(guild.roles, name=role_name)
+    if role is None:
+        # If role doesn't exist, create it
+        role = await guild.create_role(name=role_name)
+        print(f"Created role {role.name}")
     
-#     # Add the role to the member
-#     try:
-#         await member.add_roles(role)
-#         print(f"Assigned {role.name} to {member.display_name}")
-#     except discord.Forbidden:
-#         print(f"Permission error: Can't assign role to {member.display_name}")
-#     except discord.HTTPException as e:
-#         print(f"Failed to assign role: {e}")
+    # Add the role to the member
+    try:
+        await member.add_roles(role)
+        print(f"Assigned {role.name} to {member.display_name}")
+    except discord.Forbidden:
+        print(f"Permission error: Can't assign role to {member.display_name}")
+    except discord.HTTPException as e:
+        print(f"Failed to assign role: {e}")
 
 @client.tree.command(name="help",description="Show functions that bot can do.")
 # command เอาไว้แสดงว่าบอทตัวนี้ทำอะไรได้บ้าง
@@ -222,6 +238,7 @@ async def skip(interaction: discord.Interaction):
     else:
         await interaction.response.send_message("ไม่มีเพลงให้ข้ามนะ :D")
 
+# อันนี้เป็นcommandเอาไว้แสดงคําถาม
 @client.tree.command(name="coding",description="Show a coding question.")
 async def send_botton(interaction: discord.Interaction):
     button1 = Button(label="Level 1", style=discord.ButtonStyle.green)
@@ -251,7 +268,6 @@ async def send_botton(interaction: discord.Interaction):
     )
     embed.set_footer(text="Release Date: November 19, 2024")
 
-    # Send patch notes and buttons
     await interaction.response.send_message(embed=embed, view=view)
 
 level_1_questions = data["level 1"]
@@ -276,4 +292,5 @@ async def button2_callback(interaction: discord.Interaction):
 
     await interaction.response.send_message(f"**Question:** \n{question_text2} \n**input:** \n{input_text2} \n**output:** \n{output_text2}")
 
+#ใส่ discord token ของตัวเอง
 client.run(token)
