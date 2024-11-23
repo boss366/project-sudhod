@@ -11,6 +11,7 @@ from discord import Interaction
 from discord import FFmpegPCMAudio
 from discord import app_commands
 from discord.ui import Button, View
+from discord import utils
 
 queue = []
 
@@ -19,16 +20,116 @@ token = os.getenv('DISCORD_TOKEN')
 
 intents = discord.Intents.default()
 intents.message_content = True
+intents.reactions = True
 
 client = commands.Bot(command_prefix='!', intents=intents)
 
 with open('quest.json', 'r') as file:
     data = json.load(file)
 
+role_message_id = None
+emoji_to_role = {
+    "✅": "Verified"
+}
+
 @client.event
 async def on_ready():
     print(f'Logged in as {client.user}')
     await client.tree.sync()
+
+@client.event
+async def on_guild_join(guild):
+    embed = discord.Embed(
+        title=f"สวัสดีจ้าาา เรา คือ {client.user.name} นะะ",
+        description="เราเป็นบอทเพื่อช่วยคนที่สนใจเกี่ยวกับการเรียนโค้ดได้ใช้งานสะดวกมากขึ้น และเรายังมี features หลายๆอย่างรองรับการใช้งานอีกด้วย \nถ้าอยากรู้ว่าเราทำไรได้บ้างลองใช้คำสั่ง **/help** ได้เลยนะะ :D",
+        color=discord.Color.green(),
+    )
+    embed.add_field(
+        name=f"ขอบคุณที่เอา {client.user.name} เข้ามาใน sever ด้วยนะครับ",
+        value="ถ้าบอทมีปัญหาหรือมีการทำงานที่แปลกไป สามารถแจ้งกับ jeng_7 เพื่อที่นำไปปรับปรุงและแก้ไข",
+        inline=False,
+    )
+
+    embed.set_footer(text="Release Date: November 20, 2024")
+
+    # Find a suitable text channel to send the message
+    for channel in guild.text_channels:
+        if channel.permissions_for(guild.me).send_messages:
+            print(f"Sending intro message to heheha")
+            await channel.send(embed=embed)
+            break
+
+'''
+รอแก้งาน
+'''
+# @client.command(name="role")
+# async def reaction_role(ctx):
+#     global role_message_id
+#     message = await ctx.send(
+#         "React to this message to get a role!\n"
+#         "✅ for Verified"
+#     )
+
+#     # Add reaction to the message
+#     await message.add_reaction("✅")
+#     role_message_id = message.id
+#     print(f"Role message ID is set to {role_message_id}")
+
+# @client.event
+# async def on_raw_reaction_add(payload):
+#     global role_message_id
+    
+#     # Ensure the reaction is from the correct message
+#     if payload.message_id != role_message_id:
+#         return
+    
+#     guild = client.get_guild(payload.guild_id)
+#     if guild is None:
+#         return  # Bot is not in the guild
+    
+#     member = guild.get_member(payload.user_id)
+#     if member is None or member.bot:
+#         return  # Ignore bots or invalid members
+    
+#     emoji = str(payload.emoji)
+#     role_name = emoji_to_role.get(emoji)
+#     if role_name is None:
+#         return  # No role associated with this emoji
+    
+#     # Get or create the role
+#     role = discord.utils.get(guild.roles, name=role_name)
+#     if role is None:
+#         # If role doesn't exist, create it
+#         role = await guild.create_role(name=role_name)
+#         print(f"Created role {role.name}")
+    
+#     # Add the role to the member
+#     try:
+#         await member.add_roles(role)
+#         print(f"Assigned {role.name} to {member.display_name}")
+#     except discord.Forbidden:
+#         print(f"Permission error: Can't assign role to {member.display_name}")
+#     except discord.HTTPException as e:
+#         print(f"Failed to assign role: {e}")
+
+@client.tree.command(name="help",description="Show functions that bot can do.")
+# command เอาไว้แสดงว่าบอทตัวนี้ทำอะไรได้บ้าง
+async def help(interaction: discord.Interaction):
+    view = View()
+
+    embed = discord.Embed(
+        title="Bot for coding version 0",
+        color=discord.Color.blue(),
+    )
+    embed.add_field(
+        name="Features",
+        value="**/coding** \nDescription: Show a coding question.\n **/join** \nDescription: Make the bot join your voice channel.\n **/leave** \nDescription: Make the bot leave your voice channel.\n **/play** \nDescription: Make the bot play a song.\n **/skip** \nDescription: Skip the current song.",
+        inline=False,
+    )
+    
+    embed.set_footer(text="Release Date: November 20, 2024")
+
+    await interaction.response.send_message(embed=embed, view=view)
 
 # commandเอาไว้เข้า
 @client.tree.command(name="join", description="Make the bot join your voice channel.")
@@ -126,17 +227,32 @@ async def send_botton(interaction: discord.Interaction):
     button1 = Button(label="Level 1", style=discord.ButtonStyle.green)
     button1.callback = button1_callback
 
-    
     button2 = Button(label="Level 2", style=discord.ButtonStyle.grey)
     button2.callback = button2_callback
 
-    # Create a view to hold the button
     view = View()
     view.add_item(button1)
     view.add_item(button2)
 
-    # Send a message with the button
-    await interaction.response.send_message("You can click the button dai na ja :P", view=view)
+    embed = discord.Embed(
+        title="Bot for coding version 0",
+        description="This is a bot for learning code in discord,but we didn't finish yet, so we will add more features in the future.",
+        color=discord.Color.blue(),
+    )
+    embed.add_field(
+        name="Features",
+        value="**/coding** Description: Show a coding question.\n **/join** \n **/leave** \n **/play** \n **/skip**",
+        inline=False,
+    )
+    embed.add_field(
+        name="Bug Fixes",
+        value="- Resolved interaction timeout issues.\n- Improved randomization logic.",
+        inline=False,
+    )
+    embed.set_footer(text="Release Date: November 19, 2024")
+
+    # Send patch notes and buttons
+    await interaction.response.send_message(embed=embed, view=view)
 
 level_1_questions = data["level 1"]
 level_2_questions = data["level 2"]
