@@ -12,6 +12,12 @@ from discord import FFmpegPCMAudio
 from discord import app_commands
 from discord.ui import Button, View
 from discord import utils
+from pymongo import MongoClient
+
+MONGO_URI = os.getenv('MONGO_URI')
+database = MongoClient(MONGO_URI)
+db = database["chat"]
+collection = db["commmand"]
 
 queue = []
 
@@ -77,6 +83,22 @@ async def on_member_join(member):
         await channel.send(embed=embed, view=view)
     else:
         print("Default text channel not found.")
+
+# Example command to add data to MongoDB
+@client.command()
+async def add(ctx, key: str, value: str):
+    data = {"key": key, "value": value}
+    collection.insert_one(data)
+    await ctx.send(f"Added `{key}: {value}` to the database!")
+
+# Example command to retrieve data from MongoDB
+@client.command()
+async def get(ctx, key: str):
+    data = collection.find_one({"key": key})
+    if data:
+        await ctx.send(f"The value for `{key}` is `{data['value']}`.")
+    else:
+        await ctx.send(f"No data found for `{key}`.")
 
 @client.command(name="role")
 async def reaction_role(ctx):
