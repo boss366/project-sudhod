@@ -35,9 +35,7 @@ with open('quest.json', 'r') as file:
     data = json.load(file)
 
 role_message_id = None
-emoji_to_role = {
-    "✅": "Verified"
-}
+role_name = "✅ verified"
 
 @client.event
 async def on_ready():
@@ -100,19 +98,6 @@ async def get(ctx, key: str):
     else:
         await ctx.send(f"No data found for `{key}`.")
 
-@client.command(name="role")
-async def reaction_role(ctx):
-    global role_message_id
-    message = await ctx.send(
-        "React to this message to get a role!\n"
-        "✅ for Verified"
-    )
-
-    # Add reaction to the message
-    await message.add_reaction("✅")
-    role_message_id = message.id
-    print(f"Role message ID is set to {role_message_id}")
-
 @client.event
 async def on_raw_reaction_add(payload):
     global role_message_id
@@ -128,11 +113,6 @@ async def on_raw_reaction_add(payload):
     member = guild.get_member(payload.user_id)
     if member is None or member.bot:
         return  # Ignore bots or invalid members
-    
-    emoji = str(payload.emoji)
-    role_name = emoji_to_role.get(emoji)
-    if role_name is None:
-        return  # No role associated with this emoji
     
     # Get or create the role
     role = discord.utils.get(guild.roles, name=role_name)
@@ -150,8 +130,46 @@ async def on_raw_reaction_add(payload):
     except discord.HTTPException as e:
         print(f"Failed to assign role: {e}")
 
-@client.tree.command(name="help",description="Show functions that bot can do.")
+async def buttonRole_callback(interaction: Interaction):
+    guild = interaction.guild
+    
+    role = discord.utils.get(guild.roles, name=role_name)
+    if role is None:
+        role = await guild.create_role(name=role_name)
+        print(f"Created role: {role.name}")
+
+    try:
+        await interaction.user.add_roles(role)
+        await interaction.response.send_message(f"ให้ยศ {role.name} กับ {interaction.user.display_name} เรียบร้อยจ้ะ!", ephemeral=True)
+    except discord.Forbidden:
+        await interaction.response.send_message("ฉันยังไม่ได้รับสิทธิ์ให้ยศกับคนอื่นอะ.", ephemeral=True)
+    except discord.HTTPException as e:
+        await interaction.response.send_message(f"เกิดข้อผิดพลาดในการให้ยศ: {e}", ephemeral=True)
+
+@client.tree.command(name="role", description="Click to get a role.")
+async def reaction_role(interaction: Interaction):
+    global role_message_id
+
+    buttonRole = Button(label="✅ verified", style=discord.ButtonStyle.grey)
+    buttonRole.callback = buttonRole_callback
+
+    view = View()
+    view.add_item(buttonRole)
+
+    embed = discord.Embed(
+            title="กดเพื่อรับยศได้เลยยย",
+            description="สามารถกดปุ่มด้านล่างเพื่อรับยศทันที",
+            color=discord.Color.blue(),
+        )
+
+    await interaction.response.send_message(embed=embed, view=view)
+
+    message = await interaction.response.send_message(embed=embed, view=view)
+    role_message_id = message.id
+    print(f"Role message ID is set to {role_message_id}")
+
 # command เอาไว้แสดงว่าบอทตัวนี้ทำอะไรได้บ้าง
+@client.tree.command(name="help",description="Show functions that bot can do.")
 async def help(interaction: discord.Interaction):
     view = View()
 
@@ -199,7 +217,7 @@ async def play(interaction: discord.Interaction, url: str):
         with yt_dlp.YoutubeDL({'format': 'bestaudio', 'noplaylist': True}) as ydl:
             info = ydl.extract_info(url, download=False)
             title = info['title']
-        
+      
         vc = interaction.guild.voice_client
 
         if not vc:
