@@ -14,6 +14,17 @@ from discord.ui import Button, View
 from discord import utils
 from pymongo import MongoClient
 
+'''
+    /role in line 145
+    /help in line 168
+    /join in line 187
+    /leave in line 199
+    /play in line 209
+    /skip in line 266
+    /coding in line 278
+    /last_question in line 350
+'''
+
 MONGO_URI = os.getenv('MONGO_URI')
 database = MongoClient(MONGO_URI)
 db = database["chat"]
@@ -82,22 +93,6 @@ async def on_member_join(member):
     else:
         print("Default text channel not found.")
 
-# Example command to add data to MongoDB
-@client.command()
-async def add(ctx, key: str, value: str):
-    data = {"key": key, "value": value}
-    collection.insert_one(data)
-    await ctx.send(f"Added `{key}: {value}` to the database!")
-
-# Example command to retrieve data from MongoDB
-@client.command()
-async def get(ctx, key: str):
-    data = collection.find_one({"key": key})
-    if data:
-        await ctx.send(f"The value for `{key}` is `{data['value']}`.")
-    else:
-        await ctx.send(f"No data found for `{key}`.")
-
 @client.event
 async def on_raw_reaction_add(payload):
     global role_message_id
@@ -146,6 +141,7 @@ async def buttonRole_callback(interaction: Interaction):
     except discord.HTTPException as e:
         await interaction.response.send_message(f"เกิดข้อผิดพลาดในการให้ยศ: {e}", ephemeral=True)
 
+# command นี้เอาไว้ให้ยศคนในดิสคอร์ด
 @client.tree.command(name="role", description="Click to get a role.")
 async def reaction_role(interaction: Interaction):
     global role_message_id
@@ -322,6 +318,15 @@ async def button1_callback(interaction: discord.Interaction):
     input_text1 = random_question1.get("input", "No input found!")
     output_text1 = random_question1.get("output", "No output found!")
 
+    data = {
+        "userID": interaction.user.id,
+        "username": interaction.user.display_name,
+        "question": question_text1,
+        "level": "Level 1",
+        "timestamp": interaction.created_at.isoformat(),
+    }
+    collection.insert_one(data)
+
     await interaction.response.send_message(f"**Question:** \n{question_text1} \n**input:** \n{input_text1} \n**output:** \n{output_text1}")
 
 async def button2_callback(interaction: discord.Interaction):
@@ -330,7 +335,35 @@ async def button2_callback(interaction: discord.Interaction):
     input_text2 = random_question2.get("input", "No input found!")
     output_text2 = random_question2.get("output", "No output found!")
 
+    data = {
+        "userID": interaction.user.id,
+        "username": interaction.user.display_name,
+        "question": question_text2,
+        "level": "Level 2",
+        "timestamp": interaction.created_at.isoformat(),
+    }
+    collection.insert_one(data)
+
     await interaction.response.send_message(f"**Question:** \n{question_text2} \n**input:** \n{input_text2} \n**output:** \n{output_text2}")
+
+# command เอาไว้ดูข้อที่เราทำล่าสุด
+@client.tree.command(name="last_question",description="Show functions that bot can do.")
+async def collect_data(interaction: discord.Interaction):
+    try:
+        # Find the latest question in MongoDB for this user
+        query = {"userID": interaction.user.id}
+        last_question_data = collection.find_one(query, sort=[("timestamp", -1)])
+
+        if last_question_data:
+            await interaction.response.send_message(
+                f"**Last Question:** \n{last_question_data['question']}\n"
+                f"**Level:** {last_question_data['level']}\n"
+                f"**Timestamp:** {last_question_data['timestamp']}"
+            )
+        else:
+            await interaction.response.send_message("No previous questions found for you.")
+    except Exception as e:
+        await interaction.response.send_message(f"An error occurred: {e}")
 
 #ใส่ discord token ของตัวเอง
 client.run(token)
