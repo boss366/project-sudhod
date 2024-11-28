@@ -21,7 +21,7 @@ from pymongo import MongoClient
     /leave in line 199
     /play in line 209
     /skip in line 266
-    /coding in line 278
+    /practice in line 278
     /last_question in line 350
 '''
 
@@ -56,13 +56,13 @@ async def on_ready():
 @client.event
 async def on_guild_join(guild):
     embed = discord.Embed(
-        title=f"สวัสดีจ้าาา เรา คือ {client.user.name} นะะ",
-        description="เราเป็นบอทเพื่อช่วยคนที่สนใจเกี่ยวกับการเรียนโค้ดได้ใช้งานสะดวกมากขึ้น และเรายังมี features หลายๆอย่างรองรับการใช้งานอีกด้วย \nถ้าอยากรู้ว่าเราทำไรได้บ้างลองใช้คำสั่ง **/help** ได้เลยนะะ :D",
+        title=f"Hellooo I'm {client.user.name} ",
+        description="I'm a bot to help people who interested in coding to use it more conveniently. And we also have many features to support the use. \n if you want  to know what we can do try using the **\help** command",
         color=discord.Color.green(),
     )
     embed.add_field(
-        name=f"ขอบคุณที่เอา {client.user.name} เข้ามาใน sever ด้วยนะครับ",
-        value="ถ้าบอทมีปัญหาหรือมีการทำงานที่แปลกไป สามารถแจ้งกับ jeng_7 เพื่อที่นำไปปรับปรุงและแก้ไข",
+        name=f"Thank you for inviting {client.user.name} to sever ",
+        value="If the bot has any problems or malfunctions, you can report to jeng_7 for improvement and correction.",
         inline=False,
     )
 
@@ -85,8 +85,8 @@ async def on_member_join(member):
         view = View()
 
         embed = discord.Embed(
-            title=f"ยินดีตอนรับ {member.display_name} เข้ามาใน {member.guild.name} น้าาาา 👋🤓",
-            description="ขอให้สนุกกับการมาในดิสนี้นะจ้ะะ",
+            title=f"Welcome {member.display_name} To {member.guild.name} 👋🤓",
+            description="Thanks you for joining our server! We hope you have a great time here! :D",
             color=discord.Color.blue(),
         )
         await channel.send(embed=embed, view=view)
@@ -135,11 +135,11 @@ async def buttonRole_callback(interaction: Interaction):
 
     try:
         await interaction.user.add_roles(role)
-        await interaction.response.send_message(f"ให้ยศ {role.name} กับ {interaction.user.display_name} เรียบร้อยจ้ะ!", ephemeral=True)
+        await interaction.response.send_message(f"give role {role.name} with {interaction.user.display_name} its done🔥", ephemeral=True)
     except discord.Forbidden:
-        await interaction.response.send_message("ฉันยังไม่ได้รับสิทธิ์ให้ยศกับคนอื่นอะ.", ephemeral=True)
+        await interaction.response.send_message("I don't have permission give role to other people.", ephemeral=True)
     except discord.HTTPException as e:
-        await interaction.response.send_message(f"เกิดข้อผิดพลาดในการให้ยศ: {e}", ephemeral=True)
+        await interaction.response.send_message(f"An error occurres while granting : {e}", ephemeral=True)
 
 # command นี้เอาไว้ให้ยศคนในดิสคอร์ด
 @client.tree.command(name="role", description="Click to get a role.")
@@ -149,12 +149,12 @@ async def reaction_role(interaction: Interaction):
     buttonRole = Button(label="✅ verified", style=discord.ButtonStyle.grey)
     buttonRole.callback = buttonRole_callback
 
-    view = View()
+    view = View()            
     view.add_item(buttonRole)
 
     embed = discord.Embed(
-            title="กดเพื่อรับยศได้เลยยย",
-            description="สามารถกดปุ่มด้านล่างเพื่อรับยศทันที",
+            title="You can click the button below to get a role.",
+            description="Click ✅ verified button to get a role.",
             color=discord.Color.blue(),
         )
 
@@ -187,13 +187,13 @@ async def help(interaction: discord.Interaction):
 @client.tree.command(name="join", description="Make the bot join your voice channel.")
 async def join(interaction: discord.Interaction):
     if interaction.user.voice is None:
-        await interaction.response.send_message("คุณยังไม่ได้เอาผมเข้าช่องดิสเลย!", ephemeral=True)
+        await interaction.response.send_message("you haven't invited me to the voicechat !", ephemeral=True)
         return
     
     channel = interaction.user.voice.channel
     
     await channel.connect()
-    await interaction.response.send_message(f"เข้ามาในช่อง {channel} แล้วจ้าา!")
+    await interaction.response.send_message(f"join voice channel {channel} done!")
 
 # commandเอาไว้ออก
 @client.tree.command(name="leave",description="Make the bot leave your voice channel.")
@@ -201,9 +201,9 @@ async def leave(interaction: discord.Interaction):
     voice_client = interaction.guild.voice_client
     if voice_client:
         await voice_client.disconnect()
-        await interaction.response.send_message("ออกจากช่องดิสแล้วจ้าาา!")
+        await interaction.response.send_message("leave voice channel!")
     else:
-        await interaction.response.send_message("คุณยังไม่ได้เอาผมเข้าช่องดิสเลย!")
+        await interaction.response.send_message("You haven't invited me to join a voice channel 😫")
 
 # ตรงนี้เป็นcommandเล่นเพลง
 @client.tree.command(name="play",description="Make the bot play a song.")
@@ -253,7 +253,7 @@ async def play_song(interaction: discord.Interaction, url: str):
                 next_url = queue.pop(0)
                 client.loop.create_task(play_song(interaction, next_url))
             else:
-                client.loop.create_task(interaction.followup.send("ไม่มีเพลงต่อแล้ว งั้นพี่ขอออกเลยละกันนน!"))
+                client.loop.create_task(interaction.followup.send(f"No more songs in the queue,I'm leaving voice channel!"))
                 client.loop.create_task(vc.disconnect())
 
         vc.play(FFmpegPCMAudio(audio_url), after=play_next)
@@ -266,16 +266,17 @@ async def play_song(interaction: discord.Interaction, url: str):
 @client.tree.command(name="skip",description="Skip the current song.")
 async def skip(interaction: discord.Interaction):
     if interaction.guild.voice_client is None:
-        await interaction.response.send_message("ยังไม่ได้เช้าช่องดิสเลยนะ :P")
+        await interaction.response.send_message("You haven't invited me to join a voice channel 😫")
         return
 
     if interaction.guild.voice_client.is_playing():
         interaction.guild.voice_client.stop() 
+        await interaction.response.send_message("Song skipped!")
     else:
-        await interaction.response.send_message("ไม่มีเพลงให้ข้ามนะ :D")
+        await interaction.response.send_message("There are no songs to skip :P.") 
 
 # อันนี้เป็นcommandเอาไว้แสดงคําถาม
-@client.tree.command(name="coding",description="Show a coding question.")
+@client.tree.command(name="practice",description="Show a coding question.")
 async def send_botton(interaction: discord.Interaction):
     button1 = Button(label="Level 1", style=discord.ButtonStyle.green)
     button1.callback = button1_callback
@@ -357,8 +358,10 @@ async def collect_data(interaction: discord.Interaction):
         if last_question_data:
             await interaction.response.send_message(
                 f"**Last Question:** \n{last_question_data['question']}\n"
+                f"**Input:** \n{last_question_data['input']}\n"
+                f"**Output:** \n{last_question_data['output']}"
                 f"**Level:** {last_question_data['level']}\n"
-                f"**Timestamp:** {last_question_data['timestamp']}"
+                f"**Timestamp:** \n{last_question_data['timestamp']}"
             )
         else:
             await interaction.response.send_message("No previous questions found for you.")
