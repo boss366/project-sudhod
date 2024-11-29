@@ -17,6 +17,7 @@ from discord import utils
 from pymongo import MongoClient
 from fastapi import FastAPI, HTTPException
 from threading import Thread
+from pydantic import BaseModel
 
 app = FastAPI()
 
@@ -52,6 +53,12 @@ with open('quest.json', 'r') as file:
 role_message_id = None
 role_name = "✅ verified"
 
+class Item(BaseModel):
+    question: str = None
+    input: float = None
+    output: str = None
+    difficulty: int
+
 def run_fastapi():
     port = int(os.getenv("PORT", 8000))
     uvicorn.run(app, host="0.0.0.0", port=port)
@@ -76,6 +83,11 @@ async def get_commands():
 async def get_questions():
     questions = list(collection.find({}, {"_id": 0}))
     return {"questions": questions}
+
+@app.post("/items/")
+async def create_item(item: Item):
+    # You can use the item data, which is automatically parsed from JSON
+    return {"question": item.question, "input": item.input, "output": item.output, "difficulty": item.price}
 
 @app.post("/add-command")
 async def add_command(command: str):
