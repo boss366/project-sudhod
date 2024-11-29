@@ -7,6 +7,7 @@ import json
 import uvicorn
 import logging
 import requests
+import secrets
 
 from dotenv import load_dotenv
 from discord.ext import commands
@@ -30,6 +31,8 @@ api_data = {
 }
 
 logging.basicConfig(level=logging.DEBUG)
+
+api_key = secrets.token_hex(16)
 
 MONGO_URI = os.getenv('MONGO_URI')
 database = MongoClient(MONGO_URI)
@@ -77,8 +80,7 @@ def run_fastapi():
     uvicorn.run(app, host="0.0.0.0", port=port)
 
 if __name__ == "__main__":
-    fastapi_thread = Thread(target=run_fastapi)
-    fastapi_thread.start()
+    uvicorn.run(app, host="0.0.0.0", port=int(os.environ.get("PORT", 8000))), 
 
 @app.get("/")
 async def root():
@@ -354,7 +356,8 @@ async def skip(interaction: discord.Interaction):
 # อันนี้เป็นcommandเอาไว้แสดงคําถาม
 @client.tree.command(name="practice",description="Show a coding question.")
 async def send_botton(interaction: discord.Interaction):
-    quest_data = fetch_quest_data()
+    response = requests.get('https://ancient-fortress-64724-1c6507ef2f45.herokuapp.com/')
+    quest_data = response.json()
     if quest_data is None:
         await interaction.response.send_message("Error fetching quest data!")
         return
@@ -382,13 +385,20 @@ async def send_botton(interaction: discord.Interaction):
 
     await interaction.response.send_message(embed=embed, view=view)
 
-quest_data = fetch_quest_data()
+response = requests.get('https://ancient-fortress-64724-1c6507ef2f45.herokuapp.com/')
+quest_data = response.json()
 
 level_1_questions = quest_data["quest_data"]["level 1"]
 level_2_questions = quest_data["quest_data"]["level 2"]
 
 random_question1 = random.choice(level_1_questions)
 random_question2 = random.choice(level_2_questions)
+
+if quest_data and "quest_data" in quest_data:
+    level_1_questions = quest_data["quest_data"].get("level 1", [])
+else:
+    print("Quest data is missing or invalid.")
+    level_1_questions = []
 
 # ตรงนี้เป็นcommandเอาไว้สุ่มข้อความ
 async def button1_callback(interaction: discord.Interaction):
