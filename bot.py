@@ -67,7 +67,6 @@ def run_fastapi():
     uvicorn.run(app, host="127.0.0.1", port=8000)
 
 if __name__ == "__main__":
-    # Start FastAPI in a separate thread
     fastapi_thread = Thread(target=run_fastapi)
     fastapi_thread.start()
 
