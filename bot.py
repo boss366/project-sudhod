@@ -5,6 +5,7 @@ import asyncio
 import random
 import json
 import uvicorn
+import logging
 
 from dotenv import load_dotenv
 from discord.ext import commands
@@ -35,6 +36,8 @@ api_data = {
     "status": "Bot is starting...",
     "commands": []
 }
+
+logging.basicConfig(level=logging.DEBUG)
 
 MONGO_URI = os.getenv('MONGO_URI')
 database = MongoClient(MONGO_URI)
@@ -223,7 +226,7 @@ async def help(interaction: discord.Interaction):
     )
     embed.add_field(
         name="Features",
-        value="**/coding** \nDescription: Show a coding question.\n **/join** \nDescription: Make the bot join your voice channel.\n **/leave** \nDescription: Make the bot leave your voice channel.\n **/play** \nDescription: Make the bot play a song.\n **/skip** \nDescription: Skip the current song.",
+        value="**/practice** \nDescription: Show a coding question.\n **/join** \nDescription: Make the bot join your voice channel.\n **/leave** \nDescription: Make the bot leave your voice channel.\n **/play** \nDescription: Make the bot play a song.\n **/skip** \nDescription: Skip the current song.\n **/last_question** \nDescription: Show the last question.",
         inline=False,
     )
     
