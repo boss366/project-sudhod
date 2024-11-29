@@ -18,17 +18,6 @@ from pymongo import MongoClient
 from fastapi import FastAPI, HTTPException
 from threading import Thread
 
-'''
-    /role in line 145
-    /help in line 168
-    /join in line 187
-    /leave in line 199
-    /play in line 209
-    /skip in line 266
-    /practice in line 278
-    /last_question in line 350
-'''
-
 app = FastAPI()
 
 # Shared data between FastAPI and the Discord bot
