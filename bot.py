@@ -230,7 +230,7 @@ async def help(interaction: discord.Interaction):
         inline=False,
     )
     
-    embed.set_footer(text="Release Date: November 20, 2024")
+    embed.set_footer(text="Release Date: November 29, 2024")
 
     await interaction.response.send_message(embed=embed, view=view)
 
@@ -340,21 +340,15 @@ async def send_botton(interaction: discord.Interaction):
     view.add_item(button2)
 
     embed = discord.Embed(
-        title="Bot for coding version 0",
-        description="This is a bot for learning code in discord,but we didn't finish yet, so we will add more features in the future.",
+        title="Bot for coding :P",
         color=discord.Color.blue(),
     )
     embed.add_field(
-        name="Features",
-        value="**/coding** Description: Show a coding question.\n **/join** \n **/leave** \n **/play** \n **/skip**",
+        name="testing",
+        value="If you find any problems or malfunctions, you can report to jeng_7 for improvement and correction and thank you for using my bot.",
         inline=False,
     )
-    embed.add_field(
-        name="Bug Fixes",
-        value="- Resolved interaction timeout issues.\n- Improved randomization logic.",
-        inline=False,
-    )
-    embed.set_footer(text="Release Date: November 19, 2024")
+    embed.set_footer(text="Release Date: November 29, 2024")
 
     await interaction.response.send_message(embed=embed, view=view)
 
