@@ -18,6 +18,7 @@ from pymongo import MongoClient
 from fastapi import FastAPI, HTTPException
 from threading import Thread
 from pydantic import BaseModel
+from typing import Optional
 
 app = FastAPI()
 
@@ -54,10 +55,10 @@ role_message_id = None
 role_name = "✅ verified"
 
 class Item(BaseModel):
-    question: str = None
-    input: float = None
-    output: str = None
-    difficulty: int
+    question: Optional[str] = None  
+    input: Optional[str] = None   
+    output: Optional[str] = None   
+    difficulty: int 
 
 def run_fastapi():
     port = int(os.getenv("PORT", 8000))
