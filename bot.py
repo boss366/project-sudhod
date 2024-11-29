@@ -4,6 +4,7 @@ import yt_dlp
 import asyncio
 import random
 import json
+import uvicorn
 
 from dotenv import load_dotenv
 from discord.ext import commands
@@ -13,6 +14,8 @@ from discord import app_commands
 from discord.ui import Button, View
 from discord import utils
 from pymongo import MongoClient
+from fastapi import FastAPI, HTTPException
+from threading import Thread
 
 '''
     /role in line 145
@@ -24,6 +27,14 @@ from pymongo import MongoClient
     /practice in line 278
     /last_question in line 350
 '''
+
+app = FastAPI()
+
+# Shared data between FastAPI and the Discord bot
+api_data = {
+    "status": "Bot is starting...",
+    "commands": []
+}
 
 MONGO_URI = os.getenv('MONGO_URI')
 database = MongoClient(MONGO_URI)
@@ -48,11 +59,48 @@ with open('quest.json', 'r') as file:
 role_message_id = None
 role_name = "✅ verified"
 
+def run_fastapi():
+    uvicorn.run(app, host="127.0.0.1", port=8000)
+
+if __name__ == "__main__":
+    # Start FastAPI in a separate thread
+    fastapi_thread = Thread(target=run_fastapi)
+    fastapi_thread.start()
+
+@app.get("/")
+async def root():
+    return {"message": "FastAPI is running alongside the Discord bot"}
+
+@app.get("/bot-status")
+async def bot_status():
+    return {"status": api_data["status"]}
+
+@app.get("/commands")
+async def get_commands():
+    return {"commands": api_data["commands"]}
+
+@app.get("/questions")
+async def get_questions():
+    questions = list(collection.find({}, {"_id": 0}))
+    return {"questions": questions}
+
+@app.post("/add-command")
+async def add_command(command: str):
+    if command not in api_data["commands"]:
+        api_data["commands"].append(command)
+        return {"message": f"Command '{command}' added successfully"}
+    else:
+        raise HTTPException(status_code=400, detail="Command already exists")
+
 @client.event
 async def on_ready():
+    api_data["status"] = f"Bot is online as {client.user}"
+    api_data["commands"] = [
+        "role", "help", "join", "leave", "play", "skip", "practice", "last_question"
+    ]
     print(f'Logged in as {client.user}')
     await client.tree.sync()
-
+    
 @client.event
 async def on_guild_join(guild):
     embed = discord.Embed(
