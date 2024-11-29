@@ -249,6 +249,7 @@ async def leave(interaction: discord.Interaction):
 @client.tree.command(name="play",description="Make the bot play a song.")
 async def play(interaction: discord.Interaction, url: str):
     try:
+        logging.debug("Play command invoked.")
         await interaction.response.defer()
         with yt_dlp.YoutubeDL({'format': 'bestaudio', 'noplaylist': True}) as ydl:
             info = ydl.extract_info(url, download=False)
