@@ -6,6 +6,7 @@ import random
 import json
 import uvicorn
 import logging
+import requests
 
 from dotenv import load_dotenv
 from discord.ext import commands
@@ -60,6 +61,16 @@ class Item(BaseModel):
     output: Optional[str] = None   
     difficulty: int 
 
+def fetch_quest_data():
+    try:
+        response = requests.get("https://ancient-fortress-64724-1c6507ef2f45.herokuapp.com/")
+        response.raise_for_status()  
+        quest_data = response.json()  
+        return quest_data
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching quest data: {e}")
+        return None
+
 def run_fastapi():
     port = int(os.getenv("PORT", 8000))
     uvicorn.run(app, host="0.0.0.0", port=port)
@@ -79,6 +90,15 @@ async def bot_status():
 @app.get("/commands")
 async def get_commands():
     return {"commands": api_data["commands"]}
+
+@app.get("/quest-data")
+async def get_quest_data():
+    try:
+        with open('quest.json', 'r') as file:
+            data = json.load(file)
+        return {"quest_data": data}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error reading the JSON file: {e}")
 
 @app.get("/questions")
 async def get_questions():
@@ -333,6 +353,11 @@ async def skip(interaction: discord.Interaction):
 # อันนี้เป็นcommandเอาไว้แสดงคําถาม
 @client.tree.command(name="practice",description="Show a coding question.")
 async def send_botton(interaction: discord.Interaction):
+    quest_data = fetch_quest_data()
+    if quest_data is None:
+        await interaction.response.send_message("Error fetching quest data!")
+        return
+
     button1 = Button(label="Level 1", style=discord.ButtonStyle.green)
     button1.callback = button1_callback
 
@@ -356,8 +381,11 @@ async def send_botton(interaction: discord.Interaction):
 
     await interaction.response.send_message(embed=embed, view=view)
 
-level_1_questions = data["level 1"]
-level_2_questions = data["level 2"]
+quest_data = fetch_quest_data()
+
+level_1_questions = quest_data["quest_data"]["level 1"]
+level_2_questions = quest_data["quest_data"]["level 2"]
+
 random_question1 = random.choice(level_1_questions)
 random_question2 = random.choice(level_2_questions)
 
