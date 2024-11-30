@@ -68,7 +68,8 @@ if response.status_code == 200:
     try:
         quest_data = response.json()
     except ValueError:
-        print("Response content is not valid JSON")
+        print("Received invalid JSON or empty response")
+        quest_data = {}
 else:
     print(f"Request failed with status code: {response.status_code}")
 
@@ -77,6 +78,7 @@ if response.text.strip():  # Check if response is not empty
         quest_data = response.json()
     except ValueError:
         print("Response content is not valid JSON")
+        quest_data = {}
 else:
     print("Received empty response")
 
@@ -95,15 +97,6 @@ def fetch_quest_data():
     except requests.exceptions.RequestException as e:
         print(f"Error fetching quest data: {e}")
         return None
-
-def run_fastapi():
-    print("Starting FastAPI...")
-    port = int(os.getenv("PORT", 8000))
-    uvicorn.run(app, host="0.0.0.0", port=port)
-
-@app.get("/")
-def read_root():
-    return {"message": "Hello, Heroku!"}
 
 @app.get("/bot-status")
 async def bot_status():
@@ -476,15 +469,10 @@ async def collect_data(interaction: discord.Interaction):
     except Exception as e:
         await interaction.response.send_message(f"An error occurred: {e}")
 
+async def start_fastapi():
+    uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", 8000)))
+
 if __name__ == "__main__":
-    import threading
-
-    # Start FastAPI in a separate thread
-    def start_fastapi():
-        uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", 8000)))
-
-    fastapi_thread = threading.Thread(target=start_fastapi)
-    fastapi_thread.start()
-
-    # Run the Discord bot
-    asyncio.run(client.run(token))
+    loop = asyncio.get_event_loop()
+    loop.create_task(start_fastapi())
+    loop.run_until_complete(client.start(token))
