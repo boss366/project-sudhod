@@ -97,15 +97,7 @@ def fetch_quest_data():
     except requests.exceptions.RequestException as e:
         print(f"Error fetching quest data: {e}")
         return None
-
-@app.get("/bot-status")
-async def bot_status():
-    return {"status": api_data["status"]}
-
-@app.get("/commands")
-async def get_commands():
-    return {"commands": api_data["commands"]}
-
+    
 @app.get("/quest-data")
 async def get_quest_data():
     try:
@@ -114,11 +106,6 @@ async def get_quest_data():
         return {"quest_data": data}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error reading the JSON file: {e}")
-
-@app.get("/questions")
-async def get_questions():
-    questions = list(collection.find({}, {"_id": 0}))
-    return {"questions": questions}
 
 @app.post("/items/")
 async def create_item(item: Item):
