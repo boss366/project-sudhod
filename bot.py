@@ -36,9 +36,13 @@ logging.basicConfig(level=logging.DEBUG)
 api_key = secrets.token_hex(16)
 
 MONGO_URI = os.getenv('MONGO_URI')
-database = MongoClient(MONGO_URI)
-db = database["chat"]
-collection = db["commmand"]
+try:
+    database = MongoClient(MONGO_URI)
+    db = database["chat"]
+    collection = db["commmand"]
+except Exception as e:
+    print(f"Error connecting to MongoDB: {e}")
+    exit(1)
 
 queue = []
 
@@ -83,11 +87,6 @@ def run_fastapi():
 @app.get("/")
 def read_root():
     return {"message": "Hello, Heroku!"}
-
-if __name__ == "__main__":
-    port = int(os.getenv("PORT", 8000))
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=port)
 
 @app.get("/bot-status")
 async def bot_status():
@@ -317,6 +316,7 @@ async def play(interaction: discord.Interaction, url: str):
 
     except Exception as e:
         await interaction.followup.send(f"An error occurred: {e}")
+        return
 
 # ตรงนี้เป็นcommandทำให้เล่นเพลงได้แบบต่อเนื่อง
 async def play_song(interaction: discord.Interaction, url: str):
@@ -459,5 +459,15 @@ async def collect_data(interaction: discord.Interaction):
     except Exception as e:
         await interaction.response.send_message(f"An error occurred: {e}")
 
-#ใส่ discord token ของตัวเอง
-asyncio.run(client.run(token))
+if __name__ == "__main__":
+    import threading
+
+    # Start FastAPI in a separate thread
+    def start_fastapi():
+        uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", 8000)))
+
+    fastapi_thread = threading.Thread(target=start_fastapi)
+    fastapi_thread.start()
+
+    # Run the Discord bot
+    asyncio.run(client.run(token))
