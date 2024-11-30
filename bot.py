@@ -85,8 +85,11 @@ def read_root():
     return {"message": "Hello, Heroku!"}
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8000))
-    uvicorn.run(app, host="0.0.0.0", port=port)
+    # Worker process logic here
+    print("Worker process started...")
+    while True:
+        # Worker task simulation
+        print("Worker is running...")
 
 @app.get("/bot-status")
 async def bot_status():
