@@ -457,4 +457,4 @@ async def collect_data(interaction: discord.Interaction):
         await interaction.response.send_message(f"An error occurred: {e}")
 
 #ใส่ discord token ของตัวเอง
-client.run(token)
+asyncio.run(client.run(token))
