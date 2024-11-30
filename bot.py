@@ -85,11 +85,9 @@ def read_root():
     return {"message": "Hello, Heroku!"}
 
 if __name__ == "__main__":
-    # Worker process logic here
-    print("Worker process started...")
-    while True:
-        # Worker task simulation
-        print("Worker is running...")
+    port = int(os.getenv("PORT", 8000))
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=port)
 
 @app.get("/bot-status")
 async def bot_status():
@@ -460,10 +458,6 @@ async def collect_data(interaction: discord.Interaction):
             await interaction.response.send_message("No previous questions found for you.")
     except Exception as e:
         await interaction.response.send_message(f"An error occurred: {e}")
-
-logging.basicConfig(level=logging.DEBUG)
-
-logging.debug("Starting the bot script...")
 
 #ใส่ discord token ของตัวเอง
 asyncio.run(client.run(token))
