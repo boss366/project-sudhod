@@ -63,6 +63,23 @@ with open('quest.json', 'r') as file:
 role_message_id = None
 role_name = "✅ verified"
 
+response = requests.get('https://ancient-fortress-64724-1c6507ef2f45.herokuapp.com/')
+if response.status_code == 200:
+    try:
+        quest_data = response.json()
+    except ValueError:
+        print("Response content is not valid JSON")
+else:
+    print(f"Request failed with status code: {response.status_code}")
+
+if response.text.strip():  # Check if response is not empty
+    try:
+        quest_data = response.json()
+    except ValueError:
+        print("Response content is not valid JSON")
+else:
+    print("Received empty response")
+
 class Item(BaseModel):
     question: Optional[str] = None  
     input: Optional[str] = None   
