@@ -136,7 +136,7 @@ async def on_ready():
 async def on_guild_join(guild):
     embed = discord.Embed(
         title=f"Hellooo I'm {client.user.name} ",
-        description="I'm a bot to help people who interested in coding to use it more conveniently. And we also have many features to support the use. \n if you want  to know what we can do try using the **\help** command",
+        description=r"I'm a bot to help people who interested in coding to use it more conveniently. And we also have many features to support the use. \n if you want  to know what we can do try using the **\help** command",
         color=discord.Color.green(),
     )
     embed.add_field(
